@@ -3,7 +3,6 @@ package sftp
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +10,8 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"restic/backend"
 	"restic/debug"

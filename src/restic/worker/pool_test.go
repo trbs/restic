@@ -1,9 +1,10 @@
 package worker_test
 
 import (
-	"errors"
 	"testing"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"restic/worker"
 )

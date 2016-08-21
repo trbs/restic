@@ -1,9 +1,10 @@
 package checker
 
 import (
-	"errors"
 	"fmt"
 	"sync"
+
+	"github.com/pkg/errors"
 
 	"restic"
 	"restic/backend"

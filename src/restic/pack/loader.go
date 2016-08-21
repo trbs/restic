@@ -1,8 +1,9 @@
 package pack
 
 import (
-	"errors"
 	"restic/backend"
+
+	"github.com/pkg/errors"
 )
 
 // Loader loads data from somewhere at a given offset. In contrast to
