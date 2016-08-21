@@ -3,6 +3,7 @@ package sftp
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,7 +15,6 @@ import (
 	"restic/backend"
 	"restic/debug"
 
-	"github.com/juju/errors"
 	"github.com/pkg/sftp"
 )
 
@@ -173,9 +173,8 @@ func (r *SFTP) tempFile() (string, *sftp.File, error) {
 	buf := make([]byte, tempfileRandomSuffixLength)
 	_, err := io.ReadFull(rand.Reader, buf)
 	if err != nil {
-		return "", nil, errors.Annotatef(err,
-			"unable to read %d random bytes for tempfile name",
-			tempfileRandomSuffixLength)
+		return "", nil, fmt.Errorf("unable to read %d random bytes for tempfile name: %v",
+			tempfileRandomSuffixLength, err)
 	}
 
 	// construct tempfile name
@@ -184,7 +183,7 @@ func (r *SFTP) tempFile() (string, *sftp.File, error) {
 	// create file in temp dir
 	f, err := r.c.Create(name)
 	if err != nil {
-		return "", nil, errors.Annotatef(err, "creating tempfile %q failed", name)
+		return "", nil, fmt.Errorf("creating tempfile %q failed: %v", name, err)
 	}
 
 	return name, f, nil
