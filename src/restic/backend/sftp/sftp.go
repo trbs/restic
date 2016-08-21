@@ -3,7 +3,6 @@ package sftp
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -91,7 +90,7 @@ func Open(dir string, program string, args ...string) (*SFTP, error) {
 	// test if all necessary dirs and files are there
 	for _, d := range paths(dir) {
 		if _, err := sftp.c.Lstat(d); err != nil {
-			return nil, fmt.Errorf("%s does not exist", d)
+			return nil, errors.Errorf("%s does not exist", d)
 		}
 	}
 
@@ -174,7 +173,7 @@ func (r *SFTP) tempFile() (string, *sftp.File, error) {
 	buf := make([]byte, tempfileRandomSuffixLength)
 	_, err := io.ReadFull(rand.Reader, buf)
 	if err != nil {
-		return "", nil, fmt.Errorf("unable to read %d random bytes for tempfile name: %v",
+		return "", nil, errors.Errorf("unable to read %d random bytes for tempfile name: %v",
 			tempfileRandomSuffixLength, err)
 	}
 
@@ -184,7 +183,7 @@ func (r *SFTP) tempFile() (string, *sftp.File, error) {
 	// create file in temp dir
 	f, err := r.c.Create(name)
 	if err != nil {
-		return "", nil, fmt.Errorf("creating tempfile %q failed: %v", name, err)
+		return "", nil, errors.Errorf("creating tempfile %q failed: %v", name, err)
 	}
 
 	return name, f, nil
@@ -198,7 +197,7 @@ func (r *SFTP) mkdirAll(dir string, mode os.FileMode) error {
 			return nil
 		}
 
-		return fmt.Errorf("mkdirAll(%s): entry exists but is not a directory", dir)
+		return errors.Errorf("mkdirAll(%s): entry exists but is not a directory", dir)
 	}
 
 	// create parent directories
@@ -211,11 +210,11 @@ func (r *SFTP) mkdirAll(dir string, mode os.FileMode) error {
 	fi, err = r.c.Lstat(dir)
 	if err != nil {
 		// return previous errors
-		return fmt.Errorf("mkdirAll(%s): unable to create directories: %v, %v", dir, errMkdirAll, errMkdir)
+		return errors.Errorf("mkdirAll(%s): unable to create directories: %v, %v", dir, errMkdirAll, errMkdir)
 	}
 
 	if !fi.IsDir() {
-		return fmt.Errorf("mkdirAll(%s): entry exists but is not a directory", dir)
+		return errors.Errorf("mkdirAll(%s): entry exists but is not a directory", dir)
 	}
 
 	// set mode
@@ -236,7 +235,7 @@ func (r *SFTP) renameFile(oldname string, t backend.Type, name string) error {
 
 	// test if new file exists
 	if _, err := r.c.Lstat(filename); err == nil {
-		return fmt.Errorf("Close(): file %v already exists", filename)
+		return errors.Errorf("Close(): file %v already exists", filename)
 	}
 
 	err := r.c.Rename(oldname, filename)
@@ -349,7 +348,7 @@ func (r *SFTP) Save(h backend.Handle, p []byte) (err error) {
 	debug.Log("sftp.Save", "save %v: rename %v: %v",
 		h, path.Base(filename), err)
 	if err != nil {
-		return fmt.Errorf("sftp: renameFile: %v", err)
+		return errors.Errorf("sftp: renameFile: %v", err)
 	}
 
 	return nil

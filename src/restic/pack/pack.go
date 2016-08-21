@@ -182,7 +182,7 @@ func (p *Packer) writeHeader(wr io.Writer) (bytesWritten uint, err error) {
 		case Tree:
 			entry.Type = 1
 		default:
-			return 0, fmt.Errorf("invalid blob type %v", b.Type)
+			return 0, errors.Errorf("invalid blob type %v", b.Type)
 		}
 
 		err := binary.Write(wr, binary.LittleEndian, entry)
@@ -254,7 +254,7 @@ func NewUnpacker(k *crypto.Key, ldr Loader) (*Unpacker, error) {
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("Load at -%d failed: %v", len(buf), err)
+		return nil, errors.Errorf("Load at -%d failed: %v", len(buf), err)
 	}
 	buf = buf[:n]
 
@@ -270,7 +270,7 @@ func NewUnpacker(k *crypto.Key, ldr Loader) (*Unpacker, error) {
 		buf = make([]byte, length)
 		n, err := ldr.Load(buf, -int64(len(buf)+bs))
 		if err != nil {
-			return nil, fmt.Errorf("Load at -%d failed: %v", len(buf), err)
+			return nil, errors.Errorf("Load at -%d failed: %v", len(buf), err)
 		}
 		buf = buf[:n]
 	}
@@ -311,7 +311,7 @@ func NewUnpacker(k *crypto.Key, ldr Loader) (*Unpacker, error) {
 		case 1:
 			entry.Type = Tree
 		default:
-			return nil, fmt.Errorf("invalid type %d", e.Type)
+			return nil, errors.Errorf("invalid type %d", e.Type)
 		}
 
 		entries = append(entries, entry)
